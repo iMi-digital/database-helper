@@ -7,16 +7,13 @@ use PDO;
 use PDOException;
 use PDOStatement;
 use RuntimeException;
-use Symfony\Component\Console\Helper\Helper as AbstractHelper;
-use Symfony\Component\Console\Output\NullOutput;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Class DatabaseHelper
  *
  * @package N98\Util\Console\Helper
  */
-class Mysql extends AbstractHelper
+class Mysql
 {
     /**
      * @var array

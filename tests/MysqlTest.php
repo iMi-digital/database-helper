@@ -22,7 +22,7 @@ class MysqlTest extends TestCase
      */
     public function testHelperInstance()
     {
-        $this->assertInstanceOf('\N98\Util\Console\Helper\DatabaseHelper', $this->getHelper());
+        $this->assertInstanceOf('\IMI\DatabaseHelper\Mysql', $this->getHelper());
     }
 
     /**
