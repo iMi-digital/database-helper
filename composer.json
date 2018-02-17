@@ -1,0 +1,24 @@
+{
+    "name": "imi/database-helper",
+    "type": "library",
+    "require-dev": {
+        "phpunit/phpunit": "^5.0"
+    },
+    "authors": [
+        {
+            "name": "Alexander Menk",
+            "email": "a.menk@imi.de"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "IMI\\DatabaseHelper\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "IMI\\DatabaseHelper\\": "tests/"
+        }
+    },
+    "require": {}
+}
