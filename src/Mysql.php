@@ -13,7 +13,7 @@ use RuntimeException;
  *
  * @package N98\Util\Console\Helper
  */
-class Mysql
+class Mysql extends AbstractHelper
 {
     /**
      * @var array
@@ -45,18 +45,16 @@ class Mysql
      */
     private $verbose = false;
 
-    public function __construct($dbSettings, $verbose = false) {
+    public function __construct($dbSettings, $output = null) {
+        parent::__construct($output);
         $this->dbSettings = $dbSettings;
-        $this->verbose = $verbose;
 
         if (isset($this->dbSettings['unix_socket'])) {
             $this->isSocketConnect = true;
         }
     }
 
-    protected function writeln($text) {
-        echo $text . PHP_EOL;
-    }
+
 
     public function forceReconnect() {
         $this->_connection = null;
