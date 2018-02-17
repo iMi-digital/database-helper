@@ -14,7 +14,17 @@ class MysqlTest extends TestCase
      */
     protected function getHelper()
     {
-        return new Mysql();
+        $hostNameEnv = getenv('PHPUNIT_DB_HOSTNAME');
+        $dbNameEnv = getenv('PHPUNIT_DB_NAME');
+
+        $dbSettings = [
+            'host' => $hostNameEnv ? $hostNameEnv : 'localhost',
+            'prefix' => '',
+            'username' => getenv('PHPUNIT_DB_USERNAME'),
+            'password' => getenv('PHPUNIT_DB_PASSWORD'),
+            'dbname' => $dbNameEnv ? $dbNameEnv : 'phpunit_' . time(),
+        ];
+        return new Mysql($dbSettings);
     }
 
     /**

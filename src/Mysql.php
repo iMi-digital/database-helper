@@ -40,59 +40,8 @@ class Mysql
      */
     private $connectionType = 'default';
 
-    /**
-     * Set connection type when several db used.
-     *
-     * @param $connectionType
-     */
-    public function setConnectionType($connectionType)
-    {
-        $this->connectionType = $connectionType;
-    }
-
-    /**
-     * @param OutputInterface|null $output
-     *
-     * @throws RuntimeException
-     * @return void
-     */
-    public function detectDbSettings(OutputInterface $output)
-    {
-        if (null !== $this->dbSettings) {
-            return;
-        }
-
-        /* @var $magentoHelper MagentoHelper */
-        $magentoHelper = $this->getHelperSet()->get('magento');
-        $config = $magentoHelper->getBaseConfig(); // @TODO Use \Magento\Framework\App\DeploymentConfig ?
-
-        if (!isset($config['db'])) {
-            throw new RuntimeException('DB settings was not found in app/etc/env.php file');
-        }
-
-        if (!isset($config['db']['connection'][$this->connectionType])) {
-            throw new RuntimeException(
-                sprintf('Cannot find "%s" connection config in app/etc/env.php', $this->connectionType)
-            );
-        }
-
-        $this->dbSettings = (array) $config['db']['connection'][$this->connectionType];
-
-        $this->dbSettings['prefix'] = '';
-        if (isset($config['db']['table_prefix'])) {
-            $this->dbSettings['prefix'] = (string) $config['db']['table_prefix'];
-        }
-
-        if (
-            isset($this->dbSettings['host'])
-            && strpos($this->dbSettings['host'], ':') !== false
-        ) {
-            list($this->dbSettings['host'], $this->dbSettings['port']) = explode(':', $this->dbSettings['host']);
-        }
-
-        if (isset($this->dbSettings['comment'])) {
-            unset($this->dbSettings['comment']);
-        }
+    public function __construct($dbSettings) {
+        $this->dbSettings = $dbSettings;
 
         if (isset($this->dbSettings['unix_socket'])) {
             $this->isSocketConnect = true;
@@ -100,7 +49,7 @@ class Mysql
     }
 
     /**
-     * Connects to the database without initializing magento
+     * Connects to the database
      *
      * @param OutputInterface $output = null
      *
@@ -109,13 +58,9 @@ class Mysql
      */
     public function getConnection(OutputInterface $output = null)
     {
-        $output = $this->fallbackOutput($output);
-
         if ($this->_connection) {
             return $this->_connection;
         }
-
-        $this->detectDbSettings($output);
 
         if (!extension_loaded('pdo_mysql')) {
             throw new RuntimeException('pdo_mysql extension is not installed');
@@ -165,8 +110,6 @@ class Mysql
      */
     public function dsn()
     {
-        $this->detectDbSettings($this->fallbackOutput());
-
         // baseline of DSN parts
         $dsn = $this->dbSettings;
 
@@ -219,8 +162,6 @@ class Mysql
      */
     public function getMysqlClientToolConnectionString()
     {
-        $this->detectDbSettings($this->fallbackOutput());
-
         if ($this->isSocketConnect) {
             $string = '--socket=' . escapeshellarg($this->dbSettings['unix_socket']);
         } else {
@@ -623,7 +564,6 @@ class Mysql
      */
     public function dropDatabase(OutputInterface $output)
     {
-        $this->detectDbSettings($output);
         $db = $this->getConnection();
         $db->query('DROP DATABASE `' . $this->dbSettings['dbname'] . '`');
         $output->writeln('<info>Dropped database</info> <comment>' . $this->dbSettings['dbname'] . '</comment>');
@@ -651,7 +591,6 @@ class Mysql
      */
     public function createDatabase(OutputInterface $output)
     {
-        $this->detectDbSettings($output);
         $db = $this->getConnection();
         $db->query('CREATE DATABASE IF NOT EXISTS `' . $this->dbSettings['dbname'] . '`');
         $output->writeln('<info>Created database</info> <comment>' . $this->dbSettings['dbname'] . '</comment>');
@@ -713,29 +652,4 @@ class Mysql
         return $this->runShowCommand('STATUS', $variable);
     }
 
-    /**
-     * small helper method to obtain an object of type OutputInterface
-     *
-     * @param OutputInterface|null $output
-     *
-     * @return OutputInterface
-     */
-    private function fallbackOutput(OutputInterface $output = null)
-    {
-        if (null !== $output) {
-            return $output;
-        }
-
-        if ($this->getHelperSet()->has('io')) {
-            /** @var $helper IoHelper */
-            $helper = $this->getHelperSet()->get('io');
-            $output = $helper->getOutput();
-        }
-
-        if (null === $output) {
-            $output = new NullOutput();
-        }
-
-        return $output;
-    }
 }
