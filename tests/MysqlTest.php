@@ -183,7 +183,8 @@ class MysqlTest extends TestCase
      */
     public function resolveTables()
     {
-        $tables = $this->getHelper()->resolveTables(array('dept\_*'));
+        $helper = $this->getHelperWithTestDb();
+        $tables = $helper->resolveTables(array('dept\_*'));
         $this->assertContains('dept_emp', $tables);
         $this->assertNotContains('employees', $tables);
 
@@ -192,7 +193,7 @@ class MysqlTest extends TestCase
             'base'    => array('tables' => array('titles departments')),
         );
 
-        $tables = $this->getHelper()->resolveTables(
+        $tables = $helper->resolveTables(
             array('@dept', '@base'),
             $definitions
         );
