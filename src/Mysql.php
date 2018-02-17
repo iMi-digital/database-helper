@@ -1,6 +1,6 @@
 <?php
 
-namespace N98\Util\Console\Helper;
+namespace IMI\DatabaseHelper;
 
 use InvalidArgumentException;
 use PDO;
@@ -16,7 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @package N98\Util\Console\Helper
  */
-class DatabaseHelper extends AbstractHelper
+class Mysql extends AbstractHelper
 {
     /**
      * @var array

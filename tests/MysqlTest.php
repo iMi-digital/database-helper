@@ -1,27 +1,20 @@
 <?php
 
-namespace N98\Util\Console\Helper;
-
-use InvalidArgumentException;
-use N98\Magento\Command\TestCase;
-use RuntimeException;
+namespace IMI\DatabaseHelper;
 
 /**
  * Class DatabaseHelperTest
  *
- * @covers  \N98\Util\Console\Helper\DatabaseHelper
+ * @covers  \IMI\DatabaseHelper\Mysql
  */
-class DatabaseHelperTest extends TestCase
+class MysqlTest extends TestCase
 {
     /**
-     * @return DatabaseHelper
+     * @return Mysql
      */
     protected function getHelper()
     {
-        $command = $this->getApplication()->find('db:info');
-        $command->getHelperSet()->setCommand($command);
-
-        return $command->getHelper('database');
+        return new Mysql();
     }
 
     /**
