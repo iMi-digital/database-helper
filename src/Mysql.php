@@ -40,12 +40,22 @@ class Mysql
      */
     private $connectionType = 'default';
 
-    public function __construct($dbSettings) {
+    /**
+     * @var bool
+     */
+    private $verbose = false;
+
+    public function __construct($dbSettings, $verbose = false) {
         $this->dbSettings = $dbSettings;
+        $this->verbose = $verbose;
 
         if (isset($this->dbSettings['unix_socket'])) {
             $this->isSocketConnect = true;
         }
+    }
+
+    protected function writeln($text) {
+        echo $text . PHP_EOL;
     }
 
     /**
@@ -85,8 +95,8 @@ class Mysql
         try {
             $this->_connection->query('USE `' . $this->dbSettings['dbname'] . '`');
         } catch (PDOException $e) {
-            if (OutputInterface::VERBOSITY_VERY_VERBOSE <= $output->getVerbosity()) {
-                $output->writeln(sprintf(
+            if ($this->verbose) {
+                $this->writeln(sprintf(
                     '<error>Failed to use database <comment>%s</comment>: %s</error>',
                     var_export($this->dbSettings['dbname'], true),
                     $e->getMessage()
@@ -559,20 +569,14 @@ class Mysql
         return 'database';
     }
 
-    /**
-     * @param OutputInterface $output
-     */
-    public function dropDatabase(OutputInterface $output)
+    public function dropDatabase()
     {
         $db = $this->getConnection();
         $db->query('DROP DATABASE `' . $this->dbSettings['dbname'] . '`');
-        $output->writeln('<info>Dropped database</info> <comment>' . $this->dbSettings['dbname'] . '</comment>');
+        $this->writeln('<info>Dropped database</info> <comment>' . $this->dbSettings['dbname'] . '</comment>');
     }
 
-    /**
-     * @param OutputInterface $output
-     */
-    public function dropTables(OutputInterface $output)
+    public function dropTables()
     {
         $result = $this->getTables();
         $query = 'SET FOREIGN_KEY_CHECKS = 0; ';
@@ -583,17 +587,14 @@ class Mysql
         }
         $query .= 'SET FOREIGN_KEY_CHECKS = 1;';
         $this->getConnection()->query($query);
-        $output->writeln('<info>Dropped database tables</info> <comment>' . $count . ' tables dropped</comment>');
+        $this->writeln('<info>Dropped database tables</info> <comment>' . $count . ' tables dropped</comment>');
     }
 
-    /**
-     * @param OutputInterface $output
-     */
-    public function createDatabase(OutputInterface $output)
+    public function createDatabase()
     {
         $db = $this->getConnection();
         $db->query('CREATE DATABASE IF NOT EXISTS `' . $this->dbSettings['dbname'] . '`');
-        $output->writeln('<info>Created database</info> <comment>' . $this->dbSettings['dbname'] . '</comment>');
+        $this->writeln('<info>Created database</info> <comment>' . $this->dbSettings['dbname'] . '</comment>');
     }
 
     /**
