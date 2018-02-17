@@ -170,6 +170,11 @@ class Mysql
         return false;
     }
 
+    public function getClientTool()
+    {
+        return 'mysql';
+    }
+
     /**
      * @return string
      */
