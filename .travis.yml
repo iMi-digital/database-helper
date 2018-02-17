@@ -12,4 +12,4 @@ services:
 
 before_script:
   - composer update
-  - PHPUNIT_DB_USERNAME=root;PHPUNIT_DB_PASSWORD="";PHPUNIT_DB_HOSTNAME=localhost
+  - export PHPUNIT_DB_USERNAME=root; export PHPUNIT_DB_PASSWORD=""; export PHPUNIT_DB_HOSTNAME=localhost
