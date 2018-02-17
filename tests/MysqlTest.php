@@ -47,6 +47,8 @@ class MysqlTest extends TestCase
     }
 
     protected function tearDown() {
+        // cleanup currently disable, see
+        // @link https://stackoverflow.com/questions/48844672/creating-database-using-mysql-and-querying-information-schema-leads-to-empty-res
         /*foreach($this->cleanUpLog as $helper) {
             $helper->dropDatabase();
         }*/
@@ -179,24 +181,22 @@ class MysqlTest extends TestCase
      */
     public function resolveTables()
     {
-        $this->markTestIncomplete();
-
-        $tables = $this->getHelper()->resolveTables(array('catalog\_*'));
-        $this->assertContains('catalog_product_entity', $tables);
-        $this->assertNotContains('catalogrule', $tables);
+        $tables = $this->getHelper()->resolveTables(array('dept\_*'));
+        $this->assertContains('dept_emp', $tables);
+        $this->assertNotContains('employees', $tables);
 
         $definitions = array(
-            'catalog_glob' => array('tables' => array('catalog\_*')),
-            'directory'    => array('tables' => array('directory_country directory_country_format')),
+            'dept' => array('tables' => array('dept\_*')),
+            'base'    => array('tables' => array('titles departments')),
         );
 
         $tables = $this->getHelper()->resolveTables(
-            array('@catalog_glob', '@directory'),
+            array('@dept', '@base'),
             $definitions
         );
-        $this->assertContains('catalog_product_entity', $tables);
-        $this->assertContains('directory_country', $tables);
-        $this->assertNotContains('catalogrule', $tables);
+        $this->assertContains('dept_emp', $tables);
+        $this->assertContains('titles', $tables);
+        $this->assertNotContains('employees', $tables);
     }
 
     /**
