@@ -11,3 +11,11 @@ services:
 before_script:
   - composer update
   - export PHPUNIT_DB_USERNAME=root; export PHPUNIT_DB_PASSWORD=""; export PHPUNIT_DB_HOSTNAME=localhost
+
+script:
+  - vendor/bin/phpunit --coverage-clover=coverage.clover
+
+
+after_script:
+  - wget https://scrutinizer-ci.com/ocular.phar
+  - php ocular.phar code-coverage:upload --format=php-clover coverage.clover
