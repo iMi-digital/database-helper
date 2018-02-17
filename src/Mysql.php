@@ -446,6 +446,9 @@ class Mysql
             $input[':like'] = $this->quoteLike($prefix, $escape) . '%';
         }
 
+        $statement = $db->prepare('ANALYZE TABLES;');
+        $statement->execute($input);
+
         $query = sprintf('SELECT %s FROM information_schema.tables WHERE %s;', $column, $condition);
         $statement = $db->prepare($query, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
         $result = $statement->execute($input);

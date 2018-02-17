@@ -11,6 +11,7 @@ use RuntimeException;
  */
 class MysqlTest extends TestCase
 {
+
     /**
      * @return Mysql
      */
@@ -24,10 +25,35 @@ class MysqlTest extends TestCase
             'prefix' => '',
             'username' => getenv('PHPUNIT_DB_USERNAME'),
             'password' => getenv('PHPUNIT_DB_PASSWORD'),
-            'dbname' => $dbNameEnv ? $dbNameEnv : 'phpunit_' . microtime(true) * 10000,
+            'dbname' => $dbNameEnv ? $dbNameEnv : 'phpunit_' . rand(1, PHP_INT_MAX),
         ];
         return new Mysql($dbSettings);
     }
+
+    /**
+     * Memorizes databases (helpers) to clean up after testing
+     * @var Mysql[]
+     */
+    protected $cleanUpLog = [];
+
+    protected function getHelperWithTestDb()
+    {
+        $helper = $this->getHelper();
+        $mysqlTool = 'mysql ' . $helper->getMysqlClientToolConnectionString();
+        $helper->createDatabase();
+        exec($mysqlTool . ' < ' . escapeshellarg(dirname(__FILE__) . '/data/employees.sql'));
+        $this->cleanUpLog[] = $helper;
+        return $helper;
+    }
+
+    protected function tearDown() {
+        /*foreach($this->cleanUpLog as $helper) {
+            $helper->dropDatabase();
+        }*/
+
+        parent::tearDown();
+    }
+
 
     /**
      * @test
@@ -140,12 +166,12 @@ class MysqlTest extends TestCase
      */
     public function getTables()
     {
-        $this->markTestIncomplete();
-        $helper = $this->getHelper();
+        $helper = $this->getHelperWithTestDb();
 
         $tables = $helper->getTables();
         $this->assertInternalType('array', $tables);
-        $this->assertContains('admin_user', $tables);
+        $this->assertNotEmpty($tables);
+        $this->assertContains('employees', $tables);
     }
 
     /**
@@ -172,4 +198,14 @@ class MysqlTest extends TestCase
         $this->assertContains('directory_country', $tables);
         $this->assertNotContains('catalogrule', $tables);
     }
+
+    /**
+     * @test
+     */
+    public function getMysqlClientToolConnectionString()
+    {
+        $connectionString = $this->getHelper()->getMysqlClientToolConnectionString();
+        $this->assertInternalType('string', $connectionString);
+    }
+
 }
