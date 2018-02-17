@@ -11,23 +11,43 @@ use RuntimeException;
  */
 class MysqlTest extends TestCase
 {
+
     /**
      * @return Mysql
      */
     protected function getHelper()
     {
-        $hostNameEnv = getenv('PHPUNIT_DB_HOSTNAME');
-        $dbNameEnv = getenv('PHPUNIT_DB_NAME');
-
-        $dbSettings = [
-            'host' => $hostNameEnv ? $hostNameEnv : 'localhost',
-            'prefix' => '',
-            'username' => getenv('PHPUNIT_DB_USERNAME'),
-            'password' => getenv('PHPUNIT_DB_PASSWORD'),
-            'dbname' => $dbNameEnv ? $dbNameEnv : 'phpunit_' . microtime(true) * 10000,
-        ];
-        return new Mysql($dbSettings);
+        return parent::getMysqlDummyHelper();
     }
+
+    /**
+     * Memorizes databases (helpers) to clean up after testing
+     * @var Mysql[]
+     */
+    protected $cleanUpLog = [];
+
+    protected function getHelperWithTestDb()
+    {
+        $helper = $this->getHelper();
+        $mysqlTool = 'mysql ' . $helper->getMysqlClientToolConnectionString();
+        $helper->createDatabase();
+        $helper->forceReconnect();
+        exec($mysqlTool . ' < ' . escapeshellarg(dirname(__FILE__) . '/data/employees.sql'));
+        exec($mysqlTool . ' < ' . escapeshellarg(dirname(__FILE__) . '/data/employees.sql'));
+        $this->cleanUpLog[] = $helper;
+        return $helper;
+    }
+
+    protected function tearDown() {
+        // cleanup currently disable, see
+        // @link https://stackoverflow.com/questions/48844672/creating-database-using-mysql-and-querying-information-schema-leads-to-empty-res
+        foreach($this->cleanUpLog as $helper) {
+            $helper->dropDatabase();
+        }
+
+        parent::tearDown();
+    }
+
 
     /**
      * @test
@@ -140,12 +160,12 @@ class MysqlTest extends TestCase
      */
     public function getTables()
     {
-        $this->markTestIncomplete();
-        $helper = $this->getHelper();
+        $helper = $this->getHelperWithTestDb();
 
         $tables = $helper->getTables();
         $this->assertInternalType('array', $tables);
-        $this->assertContains('admin_user', $tables);
+        $this->assertNotEmpty($tables);
+        $this->assertContains('employees', $tables);
     }
 
     /**
@@ -153,23 +173,31 @@ class MysqlTest extends TestCase
      */
     public function resolveTables()
     {
-        $this->markTestIncomplete();
-
-        $tables = $this->getHelper()->resolveTables(array('catalog\_*'));
-        $this->assertContains('catalog_product_entity', $tables);
-        $this->assertNotContains('catalogrule', $tables);
+        $helper = $this->getHelperWithTestDb();
+        $tables = $helper->resolveTables(array('dept\_*'));
+        $this->assertContains('dept_emp', $tables);
+        $this->assertNotContains('employees', $tables);
 
         $definitions = array(
-            'catalog_glob' => array('tables' => array('catalog\_*')),
-            'directory'    => array('tables' => array('directory_country directory_country_format')),
+            'dept' => array('tables' => array('dept\_*')),
+            'base'    => array('tables' => array('titles departments')),
         );
 
-        $tables = $this->getHelper()->resolveTables(
-            array('@catalog_glob', '@directory'),
+        $tables = $helper->resolveTables(
+            array('@dept', '@base'),
             $definitions
         );
-        $this->assertContains('catalog_product_entity', $tables);
-        $this->assertContains('directory_country', $tables);
-        $this->assertNotContains('catalogrule', $tables);
+        $this->assertContains('dept_emp', $tables);
+        $this->assertContains('titles', $tables);
+        $this->assertNotContains('employees', $tables);
+    }
+
+    /**
+     * @test
+     */
+    public function getMysqlClientToolConnectionString()
+    {
+        $connectionString = $this->getHelper()->getMysqlClientToolConnectionString();
+        $this->assertInternalType('string', $connectionString);
     }
 }

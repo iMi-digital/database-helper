@@ -13,7 +13,7 @@ use RuntimeException;
  *
  * @package N98\Util\Console\Helper
  */
-class Mysql
+class Mysql extends AbstractHelper
 {
     /**
      * @var array
@@ -45,19 +45,20 @@ class Mysql
      */
     private $verbose = false;
 
-    public function __construct($dbSettings, $verbose = false) {
+    public function __construct($dbSettings, $output = null) {
+        parent::__construct($output);
         $this->dbSettings = $dbSettings;
-        $this->verbose = $verbose;
 
         if (isset($this->dbSettings['unix_socket'])) {
             $this->isSocketConnect = true;
         }
     }
 
-    protected function writeln($text) {
-        echo $text . PHP_EOL;
-    }
 
+
+    public function forceReconnect() {
+        $this->_connection = null;
+    }
     /**
      * Connects to the database
      *
@@ -165,6 +166,11 @@ class Mysql
         }
 
         return false;
+    }
+
+    public function getClientTool()
+    {
+        return 'mysql';
     }
 
     /**
@@ -446,6 +452,9 @@ class Mysql
             $input[':like'] = $this->quoteLike($prefix, $escape) . '%';
         }
 
+        $statement = $db->prepare('ANALYZE TABLES;');
+        $statement->execute($input);
+
         $query = sprintf('SELECT %s FROM information_schema.tables WHERE %s;', $column, $condition);
         $statement = $db->prepare($query, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
         $result = $statement->execute($input);
@@ -652,5 +661,4 @@ class Mysql
     {
         return $this->runShowCommand('STATUS', $variable);
     }
-
 }
