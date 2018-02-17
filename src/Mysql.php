@@ -655,5 +655,4 @@ class Mysql
     {
         return $this->runShowCommand('STATUS', $variable);
     }
-
 }

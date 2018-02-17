@@ -207,5 +207,4 @@ class MysqlTest extends TestCase
         $connectionString = $this->getHelper()->getMysqlClientToolConnectionString();
         $this->assertInternalType('string', $connectionString);
     }
-
 }
