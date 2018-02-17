@@ -58,6 +58,9 @@ class Mysql
         echo $text . PHP_EOL;
     }
 
+    public function forceReconnect() {
+        $this->_connection = null;
+    }
     /**
      * Connects to the database
      *
