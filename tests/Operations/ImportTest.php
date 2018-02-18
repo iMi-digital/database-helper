@@ -7,7 +7,7 @@ use IMI\DatabaseHelper\TestCase;
 class ImportTest extends TestCase {
 
     public function getInstance() {
-        $instance = new Import($this->getMysqlDummyHelper());
+        $instance = new Import($this->getHelper());
         $instance->setIsPipeViewerAvailable(true);
         return $instance;
     }

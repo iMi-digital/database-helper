@@ -4,6 +4,7 @@ namespace IMI\DatabaseHelper;
 
 class AbstractHelper {
     protected $output;
+    protected $asker;
 
     /**
      * Provide an output facility or null for no output
@@ -11,8 +12,9 @@ class AbstractHelper {
      *
      * @param $output mixed
      */
-    public function __construct( $output = null ) {
+    public function __construct( $output = null, $asker = null) {
         $this->output = $output;
+        $this->asker = $asker;
     }
 
     /**
@@ -24,11 +26,33 @@ class AbstractHelper {
      */
     protected function writeln( $text ) {
         if ( is_callable( $this->output ) ) {
-            $this->output( $text );
+            call_user_func_array($this->output, [ $text ]);
         } else if ( is_object( $this->output ) && method_exists( $this->output, 'writeln' ) ) {
             $this->output->writeln( $text );
         }
+
     }
 
-
+    protected function ask( $prompt, $default ) {
+        if ( is_callable( $this->asker ) ) {
+            $result = call_user_func_array($this->asker, [$prompt, $default] );
+            return $result;
+        } else if ( is_object( $this->asker ) && method_exists( $this->asker, 'ask' ) ) {
+            $result = $this->asker->ask( $prompt , $default );
+            return $result;
+        }  else if (function_exists('readline')) {
+            $result = readline ( $prompt );
+            if (!$result) {
+                $result = $default;
+            }
+            return $result;
+        } else {
+            echo $prompt;
+            $result = stream_get_line(STDIN, 1024, PHP_EOL);
+            if (!$result) {
+                $result = $default;
+            }
+            return $result;
+        }
+    }
 }

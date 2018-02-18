@@ -13,43 +13,6 @@ class MysqlTest extends TestCase
 {
 
     /**
-     * @return Mysql
-     */
-    protected function getHelper()
-    {
-        return parent::getMysqlDummyHelper();
-    }
-
-    /**
-     * Memorizes databases (helpers) to clean up after testing
-     * @var Mysql[]
-     */
-    protected $cleanUpLog = [];
-
-    protected function getHelperWithTestDb()
-    {
-        $helper = $this->getHelper();
-        $mysqlTool = 'mysql ' . $helper->getMysqlClientToolConnectionString();
-        $helper->createDatabase();
-        $helper->forceReconnect();
-        exec($mysqlTool . ' < ' . escapeshellarg(dirname(__FILE__) . '/data/employees.sql'));
-        exec($mysqlTool . ' < ' . escapeshellarg(dirname(__FILE__) . '/data/employees.sql'));
-        $this->cleanUpLog[] = $helper;
-        return $helper;
-    }
-
-    protected function tearDown() {
-        // cleanup currently disable, see
-        // @link https://stackoverflow.com/questions/48844672/creating-database-using-mysql-and-querying-information-schema-leads-to-empty-res
-        foreach($this->cleanUpLog as $helper) {
-            $helper->dropDatabase();
-        }
-
-        parent::tearDown();
-    }
-
-
-    /**
      * @test
      */
     public function testHelperInstance()
