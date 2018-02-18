@@ -52,7 +52,12 @@ class Mysql extends AbstractHelper
 
     public function __construct($dbSettings, $output = null) {
         parent::__construct($output);
-        $this->dbSettings = $dbSettings;
+        $defaults = [
+            'prefix' => '',
+            'password' => '',
+        ];
+
+        $this->dbSettings = array_merge($defaults, $dbSettings);
 
         if (isset($this->dbSettings['unix_socket'])) {
             $this->isSocketConnect = true;
