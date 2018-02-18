@@ -36,6 +36,11 @@ class Mysql extends AbstractHelper
     protected $_tables;
 
     /**
+     * @var array
+     */
+    protected $_tableDefitions;
+
+    /**
      * @var string
      */
     private $connectionType = 'default';
@@ -54,6 +59,10 @@ class Mysql extends AbstractHelper
         }
     }
 
+    public function getDbName()
+    {
+        return $this->dbSettings['dbname'];
+    }
 
 
     public function forceReconnect() {
@@ -171,6 +180,11 @@ class Mysql extends AbstractHelper
     public function getClientTool()
     {
         return 'mysql';
+    }
+
+    public function getDumpTool()
+    {
+        return 'mysqldump';
     }
 
     /**
@@ -323,6 +337,10 @@ class Mysql extends AbstractHelper
      */
     public function resolveTables(array $list, array $definitions = array(), array $resolved = array())
     {
+        if (empty($definitions)) {
+            $definitions = $this->_tableDefitions;
+        }
+
         if ($this->_tables === null) {
             $this->_tables = $this->getTables(true);
         }
@@ -393,6 +411,17 @@ class Mysql extends AbstractHelper
         $tables = array_reduce((array) $tables, array($this, 'resolveTablesArray'), null);
 
         return $tables;
+    }
+
+    /**
+     * @param array $tableDefinitions
+     *
+     * @return Mysql
+     */
+    public function setTableDefitions( $tableDefinitions ) {
+        $this->_tableDefitions = $tableDefinitions;
+
+        return $this;
     }
 
     /**
