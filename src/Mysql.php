@@ -423,7 +423,7 @@ class Mysql extends AbstractHelper
      *
      * @return Mysql
      */
-    public function setTableDefitions( $tableDefinitions ) {
+    public function setTableDefinitions( $tableDefinitions ) {
         $this->_tableDefitions = $tableDefinitions;
 
         return $this;
