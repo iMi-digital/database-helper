@@ -19,9 +19,9 @@ class Dump extends AbstractHelper {
 
 
     protected $isStdout = false;
-    protected $filename = 'dump';
+    protected $filename = 'dump.sql';
     protected $isForce = false;
-    protected $isAddTime = true;
+    protected $addTime = true;
     protected $isOnlyCommand = false;
     protected $exclude = '';
     protected $strip = '';
@@ -29,6 +29,11 @@ class Dump extends AbstractHelper {
     protected $isNoSingleTransaction;
     protected $isHumanReadable;
     protected $isRoutines;
+
+    public function __construct( Mysql $helper, $output = null, $asker = null ) {
+        parent::__construct( $output, $asker );
+        $this->helper = $helper;
+    }
 
 
     /**
@@ -145,12 +150,12 @@ class Dump extends AbstractHelper {
     {
         $nameExtension = '.sql';
 
-        $optionAddTime = $this->isAddTime;
+        $optionAddTime = $this->addTime;
         list($namePrefix, $nameSuffix) = $this->getFileNamePrefixSuffix($optionAddTime);
 
         if (
             (
-                ($fileName = $this->filename === null)
+                ($fileName = $this->filename) === null
                 || ($isDir = is_dir($fileName))
             )
             && !$this->isStdout
@@ -206,6 +211,127 @@ class Dump extends AbstractHelper {
         }
 
         return array($namePrefix, $nameSuffix);
+    }
+
+    /**
+     * @param bool $isStdout
+     *
+     * @return Dump
+     */
+    public function setIsStdout( $isStdout ) {
+        $this->isStdout = $isStdout;
+
+        return $this;
+    }
+
+    /**
+     * @param string $filename
+     *
+     * @return Dump
+     */
+    public function setFilename( $filename ) {
+        $this->filename = $filename;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $isForce
+     *
+     * @return Dump
+     */
+    public function setIsForce( $isForce ) {
+        $this->isForce = $isForce;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $addTime
+     *
+     * @return Dump
+     */
+    public function setAddTime( $addTime ) {
+        $this->addTime = $addTime;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $isOnlyCommand
+     *
+     * @return Dump
+     */
+    public function setIsOnlyCommand( $isOnlyCommand ) {
+        $this->isOnlyCommand = $isOnlyCommand;
+
+        return $this;
+    }
+
+    /**
+     * @param string $exclude
+     *
+     * @return Dump
+     */
+    public function setExclude( $exclude ) {
+        $this->exclude = $exclude;
+
+        return $this;
+    }
+
+    /**
+     * @param string $strip
+     *
+     * @return Dump
+     */
+    public function setStrip( $strip ) {
+        $this->strip = $strip;
+
+        return $this;
+    }
+
+    /**
+     * @param string $compression
+     *
+     * @return Dump
+     */
+    public function setCompression( $compression ) {
+        $this->compression = $compression;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $isNoSingleTransaction
+     *
+     * @return Dump
+     */
+    public function setIsNoSingleTransaction( $isNoSingleTransaction ) {
+        $this->isNoSingleTransaction = $isNoSingleTransaction;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $isHumanReadable
+     *
+     * @return Dump
+     */
+    public function setIsHumanReadable( $isHumanReadable ) {
+        $this->isHumanReadable = $isHumanReadable;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $isRoutines
+     *
+     * @return Dump
+     */
+    public function setIsRoutines( $isRoutines ) {
+        $this->isRoutines = $isRoutines;
+
+        return $this;
     }
 
 

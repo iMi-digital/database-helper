@@ -26,7 +26,7 @@ class AbstractHelper {
      */
     protected function writeln( $text ) {
         if ( is_callable( $this->output ) ) {
-            $this->output( $text );
+            call_user_func_array($this->output, [ $text ]);
         } else if ( is_object( $this->output ) && method_exists( $this->output, 'writeln' ) ) {
             $this->output->writeln( $text );
         }
@@ -35,7 +35,7 @@ class AbstractHelper {
 
     protected function ask( $prompt, $default ) {
         if ( is_callable( $this->asker ) ) {
-            $result = $this->asker( $prompt, $default );
+            $result = call_user_func_array($this->asker, [$prompt, $default] );
             return $result;
         } else if ( is_object( $this->asker ) && method_exists( $this->asker, 'ask' ) ) {
             $result = $this->asker->ask( $prompt , $default );
