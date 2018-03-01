@@ -695,4 +695,13 @@ class Mysql extends AbstractHelper
     {
         return $this->runShowCommand('STATUS', $variable);
     }
+
+    /**
+     * Run query you took care of that it is safely escaped
+     * @param $query
+     */
+    public function safeQuery($query)
+    {
+        $this->getConnection()->query($query);
+    }
 }
