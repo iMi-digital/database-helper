@@ -3,6 +3,7 @@
 namespace IMI\DatabaseHelper\Operations;
 use IMI\DatabaseHelper\Compressor\AbstractCompressor;
 use IMI\DatabaseHelper\Mysql;
+use IMI\DatabaseHelper\Util\Execs;
 
 /**
  * Class Import
@@ -11,6 +12,7 @@ use IMI\DatabaseHelper\Mysql;
  */
 class Import {
     protected $_isPipeViewerAvailable;
+    protected $compression;
 
     /**
      * Import constructor.
@@ -31,17 +33,31 @@ class Import {
         $this->_isPipeViewerAvailable = $available;
     }
 
-    public function getExecString($fileName, $compression = null)
+    public function setFilename($filename)
     {
-        $compressor = AbstractCompressor::create($compression);
+        $this->filename = $filename;
+    }
+
+    public function setCompression($compression)
+    {
+        $this->compression = $compression;
+    }
+
+    public function createExec()
+    {
+        $execs = new Execs($this->_helper->getClientTool());
+
+        $compressor = AbstractCompressor::create($this->compression);
         $compressor->setIsPipeViewerAvailable($this->isPipeViewerAvailable());
 
         $execString = $compressor->getDecompressingCommand(
             $this->_helper->getClientTool() . ' ' . $this->_helper->getMysqlClientToolConnectionString(),
-            $fileName
+            $this->filename
         );
 
-        return $execString;
+        $execs->add($execString);
+
+        return $execs;
     }
 
 }
