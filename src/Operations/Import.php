@@ -45,7 +45,7 @@ class Import {
 
     public function createExec()
     {
-        $execs = new Execs('');
+        $execs = new Execs();
 
         $compressor = AbstractCompressor::create($this->compression);
         $compressor->setIsPipeViewerAvailable($this->isPipeViewerAvailable());

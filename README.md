@@ -12,3 +12,13 @@ Independent of symfony packages.
 * Compressing / uncompressing dumps (by the n98 team)
 * Pipe through pipe viewer for nice progress bars
 * Remove definer statements from dumps
+
+
+## Testing
+
+Before running tests, set the following environment variables:
+
+* `PHPUNIT_DB_HOSTNAME` - defaults to localhost
+* `PHPUNIT_DB_USERNAME`
+* `PHPUNIT_DB_PASSWORD`
+* `PHPUNIT_DB_NAME` - optional - will be auto generated im omitted

@@ -22,12 +22,17 @@ class ImportTest extends TestCase {
      */
     public function getExecString()
     {
+        $instance = $this->getInstance();
+        $instance->setFilename('foo.sql');
         $this->assertStringStartsWith("pv foo.sql | mysql -h",
-            $this->getInstance()->getExecString('foo.sql')
+            implode(PHP_EOL, $instance->createExec()->getCommands())
         );
 
+        $instance = $this->getInstance();
+        $instance->setFilename('foo.sql');
+        $instance->setCompression('gzip');
         $this->assertStringStartsWith("pv -cN gzip 'foo.sql' | gzip -d | pv -cN mysql | mysql",
-            $this->getInstance()->getExecString('foo.sql', 'gzip')
+            implode(PHP_EOL, $instance->createExec()->getCommands())
         );
     }
 
