@@ -22,3 +22,7 @@ Before running tests, set the following environment variables:
 * `PHPUNIT_DB_USERNAME`
 * `PHPUNIT_DB_PASSWORD`
 * `PHPUNIT_DB_NAME` - optional - will be auto generated im omitted
+
+## Similar Packages
+
+https://github.com/spatie/db-dumper
